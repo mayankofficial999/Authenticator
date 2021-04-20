@@ -6,6 +6,13 @@ class Authentication
   Future<FirebaseApp> initializeFirebase() async 
   {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    if (user == null) {
+      print('User is currently signed out!');
+    } else {
+      print('User is signed in!');
+    }
+    });
 
     // TODO: Add auto login logic
 
@@ -15,7 +22,6 @@ class Authentication
   void signInWithGoogle() async {
     initializeFirebase();
     FirebaseAuth auth = FirebaseAuth.instance;
-    User? user;
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
@@ -49,6 +55,7 @@ class Authentication
 
   void signup(String a,String b) async
   {
+    initializeFirebase();
     try {
     UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
     email: a,
@@ -70,6 +77,7 @@ class Authentication
 
   void signin(String a,String b) async
   {
+    initializeFirebase();
     try {
     UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
     email: a,
@@ -86,19 +94,21 @@ class Authentication
 
   void checkLogin() async
   {
-     if(FirebaseAuth.instance.currentUser?.uid == null){
-                 print('User is logged out');
-                 }
-                 else {
-                 // logged
-                 print('User is logged in');
-                 }
+    if(FirebaseAuth.instance.currentUser?.uid == null){
+      print('User is logged out');
+    }
+    else{
+      // logged
+      print('User is logged in');
+    }
   }
 
-  void logout() async
+  void logoutEmail() async
   {
-    await GoogleSignIn().signOut();
     await FirebaseAuth.instance.signOut();
   }
-
+  void logoutGoogle() async
+  {
+    await GoogleSignIn().signOut();
+  }
 }

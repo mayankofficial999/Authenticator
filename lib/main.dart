@@ -5,7 +5,7 @@ import 'authentication.dart';
 //import 'package:firebase_core/firebase_core.dart';
 String id='',pass='';
 void main() {
-  runApp(MaterialApp(home:LoginPage(),theme: ThemeData(primaryColor: Colors.pink[200],)));
+  runApp(MaterialApp(home:LoginPage(),theme: ThemeData(primaryColor: Colors.lightGreen[50],)));
 }
 
 class LoginPage extends StatefulWidget {
@@ -22,19 +22,20 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(title: Center(child:Text("Authenticator",style: TextStyle(color: Colors.white,),),),),
+      //appBar: AppBar(title: Center(child:Text("Authenticator",style: TextStyle(color: Colors.white,),),),),
       body:
       Container(
         constraints: BoxConstraints.expand(),
         decoration: BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage("https://t3.ftcdn.net/jpg/02/42/77/22/360_F_242772256_PRwokoyoXkDCIISNjfj9N3If0TPFtje8.jpg"),
+          image: NetworkImage("https://i.redd.it/y1ostvqnr4711.jpg"),
           fit: BoxFit.cover)
         ),
         child:
         Column(
           children:
         [
+          //Title
           Center(child:
           Container(child:
           Text("Firebase",
@@ -44,18 +45,10 @@ class _LoginPageState extends State<LoginPage> {
             decoration:TextDecoration.underline,
             color: Colors.grey[800])
           ),
-          margin: const EdgeInsets.only(top:80),
+          margin: const EdgeInsets.only(top:200,bottom:30),
           )
           ),
-
-          // Container(
-          //   margin: EdgeInsets.only(top: 20),
-          //   child:
-          //   Center(child:
-          //   Text("Email/Phone Number"),
-          //   ),
-          // ),
-
+          // Username-Input
           Container(child:
             TextFormField(
               decoration: const InputDecoration(
@@ -70,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             margin: const EdgeInsets.only(left: 20,right: 20,top: 30),
             ),
-
+          // Password-Input
           Container(child:
             TextFormField(
               decoration: const InputDecoration(
@@ -85,24 +78,24 @@ class _LoginPageState extends State<LoginPage> {
             ),
             margin: const EdgeInsets.only(top: 20,left: 20,right: 20,bottom: 40)
             ),
-
+          //SignIn or SignUp Buttons
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            ElevatedButton(onPressed: (){obj.initializeFirebase();obj.signin(myController1.text, myController2.text);obj.checkLogin();},child: Text("Sign In"),),
-            ElevatedButton(onPressed: (){obj.initializeFirebase();obj.signup(myController1.text, myController2.text);},child: Text("Sign Up"),),
+            ElevatedButton(onPressed: (){obj.signin(myController1.text, myController2.text);},child: Text("Sign In"),),
+            ElevatedButton(onPressed: (){obj.signup(myController1.text, myController2.text);},child: Text("Sign Up"),),
           ]),
-
+          // OR Text
           Center(child:
           Text("OR",style: TextStyle(fontSize: 18))
           ),
-
+          //Sign in using Text:
           Container(child:
           Center(child:
           Text("Sign In using :",style: TextStyle(fontSize: 18))
           ),
           margin: EdgeInsets.only(top:20,bottom:20),
           ),
-
+          //Google and OTP Sign-In Buttons
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
             // SignInButton(Buttons.Google,onPressed: () {},),
@@ -114,19 +107,19 @@ class _LoginPageState extends State<LoginPage> {
               //  ImageIcon(AssetImage("assets/icons/apple.png"),size: 30),
               //  onPressed: (){},
               //  ),
-
+              // Google Sign In Icon
                FloatingActionButton(
               backgroundColor: Colors.white,
               child:
                Image.asset('assets/icons/google.png',height: 50,width: 50,),
-               onPressed:() {obj.signInWithGoogle();obj.checkLogin();}
+               onPressed:() {obj.signInWithGoogle();}
                ),
-
+              //OTP-Sign In Icon
                FloatingActionButton(
               backgroundColor: Colors.blueAccent,
               child:
                Icon(Icons.phone,size: 30,),
-               onPressed: (){obj.logout(); obj.checkLogin();},
+               onPressed: (){obj.logoutEmail();},
                ),
               
           ]),
