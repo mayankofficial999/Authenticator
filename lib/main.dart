@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'authentication.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:firebase_core/firebase_core.dart';
 String id='',pass='';
@@ -22,7 +21,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Authenticator",style: TextStyle(color: Colors.white,),),),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(title: Center(child:Text("Authenticator",style: TextStyle(color: Colors.white,),),),),
       body:
       Container(
         constraints: BoxConstraints.expand(),
@@ -88,8 +88,8 @@ class _LoginPageState extends State<LoginPage> {
 
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            ElevatedButton(onPressed: (){obj.signin(myController1.text, myController2.text);obj.checkLogin();},child: Text("Sign In"),),
-            ElevatedButton(onPressed: (){obj.signup(myController1.text, myController2.text);},child: Text("Sign Up"),),
+            ElevatedButton(onPressed: (){obj.initializeFirebase();obj.signin(myController1.text, myController2.text);obj.checkLogin();},child: Text("Sign In"),),
+            ElevatedButton(onPressed: (){obj.initializeFirebase();obj.signup(myController1.text, myController2.text);},child: Text("Sign Up"),),
           ]),
 
           Center(child:
@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
               backgroundColor: Colors.white,
               child:
                Image.asset('assets/icons/google.png',height: 50,width: 50,),
-               onPressed:() async { await FirebaseAuth.instance.signOut();obj.checkLogin();}
+               onPressed:() {obj.logout(); obj.checkLogin();}
                ),
 
                FloatingActionButton(

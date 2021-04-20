@@ -3,13 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:google_sign_in/google_sign_in.dart';
 class Authentication
 {
-  static Future<FirebaseApp> initializeFirebase() async {
+  Future<FirebaseApp> initializeFirebase() async 
+  {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
 
     // TODO: Add auto login logic
 
     return firebaseApp;
   }
+
   void signup(String a,String b) async
   {
     try {
@@ -56,5 +58,10 @@ class Authentication
                  // logged
                  print('User is logged in');
                  }
+  }
+
+  void logout() async
+  {
+    await FirebaseAuth.instance.signOut();
   }
 }
