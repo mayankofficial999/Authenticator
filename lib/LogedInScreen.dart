@@ -9,7 +9,7 @@ class LogedInPage extends StatelessWidget{
         constraints: BoxConstraints.expand(),
         decoration: BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage("https://t3.ftcdn.net/jpg/02/42/77/22/360_F_242772256_PRwokoyoXkDCIISNjfj9N3If0TPFtje8.jpg"),
+          image: NetworkImage("https://i.redd.it/y1ostvqnr4711.jpg"),
           fit: BoxFit.cover)
         ),
         child: Container(),
