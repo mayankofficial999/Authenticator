@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'authentication.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:firebase_core/firebase_core.dart';
 String id='',pass='';
 void main() {
@@ -119,14 +119,14 @@ class _LoginPageState extends State<LoginPage> {
               backgroundColor: Colors.white,
               child:
                Image.asset('assets/icons/google.png',height: 50,width: 50,),
-               onPressed:() {obj.logout(); obj.checkLogin();}
+               onPressed:() {obj.signInWithGoogle();obj.checkLogin();}
                ),
 
                FloatingActionButton(
               backgroundColor: Colors.blueAccent,
               child:
                Icon(Icons.phone,size: 30,),
-               onPressed: (){},
+               onPressed: (){obj.logout(); obj.checkLogin();},
                ),
               
           ]),
