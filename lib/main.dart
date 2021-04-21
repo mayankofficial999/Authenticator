@@ -1,12 +1,94 @@
 import 'package:authenticator/LogedInScreen.dart';
+import 'package:authenticator/PhoneAuth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'authentication.dart';
+
 //import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:firebase_core/firebase_core.dart';
 void main() {
   runApp(MaterialApp(home:LoginPage(),theme: ThemeData(primaryColor: Colors.lightGreen[50],)));
+}
+
+class OTPcheck extends StatefulWidget {
+  @override
+  _OTPcheckState createState() => _OTPcheckState();
+}
+
+class _OTPcheckState extends State<OTPcheck> {
+  var hint;
+  int c=0;
+  final myController3 = TextEditingController();
+  final myController4 = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      //appBar: AppBar(title: Center(child:Text("Authenticator",style: TextStyle(color: Colors.white,),),),),
+      body:
+      Container(
+        constraints: BoxConstraints.expand(),
+        decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/background/y1ostvqnr4711.jpg'),
+          fit: BoxFit.cover)
+        ),
+        child:
+        Column(
+          children:
+        [
+          //Title
+          Center(child:
+          Container(child:
+          ClipOval(
+          child:
+              Image.network("https://img.freepik.com/free-vector/security-otp-one-time-password-smartphone-shield_9904-104.jpg?size=626&ext=jpg",
+              fit: BoxFit.fill),
+          ),
+          margin: const EdgeInsets.only(top:150,bottom:50,left: 100,right: 100),
+          )
+          ),
+          Text('Verification',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,)),
+          Text(''),
+          Container(child:
+          TextFormField(
+              decoration: const InputDecoration(
+              icon: Icon(Icons.phone),
+              border: OutlineInputBorder(),
+              hintText: '+91XXXXXXXXXX',
+              labelText: 'Phone Number',
+              ),
+              controller: myController3,
+            ),
+            margin: EdgeInsets.only(left: 20,right: 20,top: 10),
+          ),
+          Text(''),
+          // Container(child:
+          // TextFormField(
+          //     decoration: const InputDecoration(
+          //     icon: Icon(Icons.message),
+          //     border: OutlineInputBorder(),
+          //     hintText: '_ _ _ _ _ _',
+          //     labelText: 'Enter OTP',
+          //     ),
+          //     controller: myController4,
+          //   ),
+          //   margin: EdgeInsets.only(left: 20,right: 20,top: 30,bottom: 50),
+          // ),
+             Text(''),
+            ElevatedButton(onPressed: () async{
+              // ignore: unused_local_variable
+              FirebaseApp firebaseApp = await Firebase.initializeApp();
+              PhoneAuth(myController3.text,myController4.text).verifyPhone();
+              if(FirebaseAuth.instance.currentUser!=null) Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+              }, child: Text('      Verify      ')),
+        ]
+        ),
+      ),
+    );
+  }
 }
 
 class LoginPage extends StatefulWidget {
@@ -29,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
         constraints: BoxConstraints.expand(),
         decoration: BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage("https://i.redd.it/y1ostvqnr4711.jpg"),
+          image: AssetImage('assets/background/y1ostvqnr4711.jpg'),
           fit: BoxFit.cover)
         ),
         child:
@@ -132,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
               backgroundColor: Colors.white,
               child:
                Image.asset('assets/icons/google.png',height: 50,width: 50,),
-               onPressed:() {obj.signInWithGoogle();if(FirebaseAuth.instance.currentUser!=null)Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);}
+               onPressed:() {obj.signInWithGoogle();if(FirebaseAuth.instance.currentUser!=null) Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);}
                ),
               //OTP-Sign In Icon
                FloatingActionButton(
@@ -140,7 +222,7 @@ class _LoginPageState extends State<LoginPage> {
               backgroundColor: Colors.blueAccent,
               child:
                Icon(Icons.phone,size: 30,),
-               onPressed: (){obj.logoutEmail();},
+               onPressed: (){Navigator.push(context,MaterialPageRoute(builder: (context) => OTPcheck()),);},
                ),
               
           ]),

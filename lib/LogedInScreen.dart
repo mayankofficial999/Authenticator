@@ -28,7 +28,7 @@ class _LogedInPageState extends State<LogedInPage> {
 
   String checkMail()
   {
-    if(FirebaseAuth.instance.currentUser==null)
+    if(FirebaseAuth.instance.currentUser?.email==null)
     return " NA";
     else
     return FirebaseAuth.instance.currentUser?.email as String;
@@ -37,13 +37,12 @@ class _LogedInPageState extends State<LogedInPage> {
     @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       //appBar: AppBar(title: Center(child:Text("User Screen",style: TextStyle(color: Colors.white,),),),),
       body:Container(
         constraints: BoxConstraints.expand(),
         decoration: BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage("https://i.redd.it/y1ostvqnr4711.jpg",),
+          image: AssetImage('assets/background/y1ostvqnr4711.jpg'),
           fit: BoxFit.cover,)
         ),
         child: Column(
@@ -57,7 +56,7 @@ class _LogedInPageState extends State<LogedInPage> {
               Image.network(checkUrl(),
               fit: BoxFit.fill),
           ),
-          margin: const EdgeInsets.only(top:200,bottom:30,left: 120,right: 120),
+          margin: const EdgeInsets.only(top:200,bottom:30,left: 180,right: 180),
           )
           ),
           //Name
