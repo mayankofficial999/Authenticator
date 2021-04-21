@@ -1,9 +1,10 @@
+import 'package:authenticator/LogedInScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'authentication.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:firebase_core/firebase_core.dart';
-String id='',pass='';
 void main() {
   runApp(MaterialApp(home:LoginPage(),theme: ThemeData(primaryColor: Colors.lightGreen[50],)));
 }
@@ -81,8 +82,26 @@ class _LoginPageState extends State<LoginPage> {
           //SignIn or SignUp Buttons
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            ElevatedButton(onPressed: (){obj.signin(myController1.text, myController2.text);},child: Text("Sign In"),),
-            ElevatedButton(onPressed: (){obj.signup(myController1.text, myController2.text);},child: Text("Sign Up"),),
+            ElevatedButton(onPressed: () {
+              obj.signin(myController1.text,myController2.text);
+              FirebaseAuth.instance.authStateChanges().listen((User? user) {
+              if(user!=null)
+              Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+              }
+              );
+              },
+              child: Text("Sign In"),
+              ),
+            ElevatedButton(onPressed: () {
+              obj.signup(myController1.text,myController2.text);
+              FirebaseAuth.instance.authStateChanges().listen((User? user) {
+              if(user!=null)
+              Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+              }
+              );
+              },
+              child: Text("Sign Up"),
+              ),
           ]),
           // OR Text
           Center(child:
@@ -109,13 +128,15 @@ class _LoginPageState extends State<LoginPage> {
               //  ),
               // Google Sign In Icon
                FloatingActionButton(
+                 heroTag: 'btn1',
               backgroundColor: Colors.white,
               child:
                Image.asset('assets/icons/google.png',height: 50,width: 50,),
-               onPressed:() {obj.signInWithGoogle();}
+               onPressed:() {obj.signInWithGoogle();if(FirebaseAuth.instance.currentUser!=null)Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);}
                ),
               //OTP-Sign In Icon
                FloatingActionButton(
+                 heroTag: 'btn2',
               backgroundColor: Colors.blueAccent,
               child:
                Icon(Icons.phone,size: 30,),

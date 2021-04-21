@@ -13,13 +13,10 @@ class Authentication
       print('User is signed in!');
     }
     });
-
-    // TODO: Add auto login logic
-
     return firebaseApp;
   }
 
-  void signInWithGoogle() async {
+  Future<User?> signInWithGoogle() async {
     initializeFirebase();
     FirebaseAuth auth = FirebaseAuth.instance;
     // Trigger the authentication flow
@@ -37,6 +34,7 @@ class Authentication
     try {
         final UserCredential userCredential = await auth.signInWithCredential(credential);
         print("Google Sign-In Successful");
+        return userCredential.user;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential') {
           // handle the error here
@@ -53,7 +51,7 @@ class Authentication
     }
   }
 
-  void signup(String a,String b) async
+  Future<User?> signup(String a,String b) async
   {
     initializeFirebase();
     try {
@@ -61,6 +59,7 @@ class Authentication
     email: a,
     password:b
     );
+    return userCredential.user;
     } on FirebaseAuthException catch (e)
    {
     if (e.code == 'weak-password') {
@@ -75,7 +74,7 @@ class Authentication
   }
 }
 
-  void signin(String a,String b) async
+  Future<User?> signin(String a,String b) async
   {
     initializeFirebase();
     try {
@@ -83,6 +82,7 @@ class Authentication
     email: a,
     password: b
     );
+    return userCredential.user;
     } on FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
     print('No user found for that email.');
@@ -92,16 +92,16 @@ class Authentication
     }
   }
 
-  void checkLogin() async
-  {
-    if(FirebaseAuth.instance.currentUser?.uid == null){
-      print('User is logged out');
-    }
-    else{
-      // logged
-      print('User is logged in');
-    }
-  }
+  // void checkLogin() async
+  // {
+  //   if(FirebaseAuth.instance.currentUser?.uid == null){
+  //     print('User is logged out');
+  //   }
+  //   else{
+  //     // logged
+  //     print('User is logged in');
+  //   }
+  // }
 
   void logoutEmail() async
   {
@@ -110,5 +110,11 @@ class Authentication
   void logoutGoogle() async
   {
     await GoogleSignIn().signOut();
+  }
+  void logout()
+  {
+    initializeFirebase();
+    logoutEmail();
+    logoutGoogle();
   }
 }
