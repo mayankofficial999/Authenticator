@@ -56,7 +56,7 @@ class _LogedInPageState extends State<LogedInPage> {
               Image.network(checkUrl(),
               fit: BoxFit.fill),
           ),
-          margin: const EdgeInsets.only(top:200,bottom:30,left: 180,right: 180),
+          margin: const EdgeInsets.only(top:200,bottom:40,left: 120,right: 120),
           )
           ),
           //Name
