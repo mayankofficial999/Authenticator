@@ -1,14 +1,13 @@
+import 'package:authenticator/authentication.dart';
 import 'package:authenticator/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'Authentication.dart';
 class LogedInPage extends StatefulWidget{
   @override
   _LogedInPageState createState() => _LogedInPageState();
 }
 
 class _LogedInPageState extends State<LogedInPage> {
-  final obj=Authentication();
 
   String checkUrl()
   {
@@ -36,6 +35,7 @@ class _LogedInPageState extends State<LogedInPage> {
 
     @override
   Widget build(BuildContext context) {
+    final obj=Authentication(context);
     return Scaffold(
       //appBar: AppBar(title: Center(child:Text("User Screen",style: TextStyle(color: Colors.white,),),),),
       body:Container(
@@ -85,7 +85,14 @@ class _LogedInPageState extends State<LogedInPage> {
           ElevatedButton(
           onPressed: () async {
             obj.logout();
-            Navigator.push(context,MaterialPageRoute(builder: (context) => LoginPage()),);
+            FirebaseAuth.instance.authStateChanges().listen((User? user) {
+              if (user == null) {
+                Navigator.push(context,MaterialPageRoute(builder: (context) => LoginPage()),);
+                print('User is signed out!');
+              } else {
+                print('');
+              }
+              });
           },
           child: Text('Sign Out')),
           ),

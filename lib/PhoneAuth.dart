@@ -1,10 +1,27 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 class PhoneAuth
 {
+  final BuildContext context;
+  Future<void> _showMyDialog(String x) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: true, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Error'),
+        content: SingleChildScrollView(
+          child: 
+              Text('$x'),
+          ),
+        );
+      },
+    );
+  }
   FirebaseAuth auth= FirebaseAuth.instance;
   final String phoneNo;
   final String? otp;
-  PhoneAuth(this.phoneNo,this.otp);
+  PhoneAuth(this.phoneNo,this.otp,this.context);
   Future<String?> verifyPhone() async
   {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
@@ -21,6 +38,7 @@ class PhoneAuth
      return null;
     },
     verificationFailed: (FirebaseAuthException e) {
+      _showMyDialog(e.code);
     if (e.code == 'invalid-phone-number') {
       print('The provided phone number is not valid.');
     }

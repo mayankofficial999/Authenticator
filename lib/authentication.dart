@@ -1,8 +1,26 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 class Authentication
 {
+  final BuildContext context;
+  Authentication(this.context);
+  Future<void> _showMyDialog(String x) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: true, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Error'),
+        content: SingleChildScrollView(
+          child: 
+              Text('$x'),
+          ),
+        );
+      },
+    );
+  }
   Future<FirebaseApp> initializeFirebase() async 
   {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
@@ -17,7 +35,7 @@ class Authentication
   }
 
   Future<User?> signInWithGoogle() async {
-    initializeFirebase();
+    Firebase.initializeApp();
     FirebaseAuth auth = FirebaseAuth.instance;
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -36,6 +54,7 @@ class Authentication
         print("Google Sign-In Successful");
         return userCredential.user;
       } on FirebaseAuthException catch (e) {
+        _showMyDialog(e.code,);
         if (e.code == 'account-exists-with-different-credential') {
           // handle the error here
           print("account-exists-with-different-credential");
@@ -53,7 +72,7 @@ class Authentication
 
   Future<User?> signup(String a,String b) async
   {
-    initializeFirebase();
+    Firebase.initializeApp();
     try {
     UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
     email: a,
@@ -62,6 +81,7 @@ class Authentication
     return userCredential.user;
     } on FirebaseAuthException catch (e)
    {
+     _showMyDialog(e.code);
     if (e.code == 'weak-password') {
     print('The password provided is too weak.');
     }
@@ -76,7 +96,7 @@ class Authentication
 
   Future<User?> signin(String a,String b) async
   {
-    initializeFirebase();
+    Firebase.initializeApp();
     try {
     UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
     email: a,
@@ -84,6 +104,7 @@ class Authentication
     );
     return userCredential.user;
     } on FirebaseAuthException catch (e) {
+      _showMyDialog(e.code);
     if (e.code == 'user-not-found') {
     print('No user found for that email.');
     } else if (e.code == 'wrong-password') {
@@ -113,8 +134,9 @@ class Authentication
   }
   void logout()
   {
-    initializeFirebase();
+    Firebase.initializeApp();
     logoutEmail();
     logoutGoogle();
   }
+  
 }

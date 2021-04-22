@@ -5,11 +5,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'authentication.dart';
+import 'package:flutter/services.dart';
 
 //import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:firebase_core/firebase_core.dart';
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIOverlays(
+      [SystemUiOverlay.bottom, SystemUiOverlay.top]);
   runApp(MaterialApp(home:LoginPage(),theme: ThemeData(primaryColor: Colors.lightGreen[50],)));
+  await Firebase.initializeApp();
+  Duration(milliseconds: 1000);
 }
 
 class OTPcheck extends StatefulWidget {
@@ -21,7 +27,7 @@ class _OTPcheckState extends State<OTPcheck> {
   var hint;
   int c=0;
   final myController3 = TextEditingController();
-  final myController4 = TextEditingController();
+  // final myController4 = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,10 +85,16 @@ class _OTPcheckState extends State<OTPcheck> {
           // ),
              Text(''),
             ElevatedButton(onPressed: () async{
-              // ignore: unused_local_variable
-              FirebaseApp firebaseApp = await Firebase.initializeApp();
-              PhoneAuth(myController3.text,myController4.text).verifyPhone();
-              if(FirebaseAuth.instance.currentUser!=null) Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+              Firebase.initializeApp();
+              FirebaseAuth.instance.authStateChanges().listen((User? user) {
+                  if (user == null) {
+                    print('');
+                  } else {
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+                    print('User is signed in!');
+                  }
+                  });
+                  PhoneAuth(myController3.text,'',context).verifyPhone();
               }, child: Text('      Verify      ')),
         ]
         ),
@@ -98,11 +110,11 @@ class LoginPage extends StatefulWidget {
  
 class _LoginPageState extends State<LoginPage> {
   //bool _isSigningIn = false;
-  final obj =Authentication();
   final myController1 = TextEditingController();
   final myController2 = TextEditingController();
   @override
   Widget build(BuildContext context) {
+  final obj =Authentication(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       //appBar: AppBar(title: Center(child:Text("Authenticator",style: TextStyle(color: Colors.white,),),),),
@@ -154,6 +166,7 @@ class _LoginPageState extends State<LoginPage> {
               hintText: 'Password',
               labelText: 'Password',
               ),
+              obscureText: true,
               controller: myController2,
               // onSaved: (String? value) {
               //   pass="$value";
@@ -165,6 +178,7 @@ class _LoginPageState extends State<LoginPage> {
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
             ElevatedButton(onPressed: () {
+              Authentication(context);
               obj.signin(myController1.text,myController2.text);
               FirebaseAuth.instance.authStateChanges().listen((User? user) {
               if(user!=null)
@@ -175,6 +189,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Text("Sign In"),
               ),
             ElevatedButton(onPressed: () {
+              Authentication(context);
               obj.signup(myController1.text,myController2.text);
               FirebaseAuth.instance.authStateChanges().listen((User? user) {
               if(user!=null)
@@ -214,7 +229,19 @@ class _LoginPageState extends State<LoginPage> {
               backgroundColor: Colors.white,
               child:
                Image.asset('assets/icons/google.png',height: 50,width: 50,),
-               onPressed:() {obj.signInWithGoogle();if(FirebaseAuth.instance.currentUser!=null) Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);}
+               onPressed:() async {
+                  Authentication(context);
+                  obj.signInWithGoogle();
+                  Future.delayed(const Duration(milliseconds: 2000));
+                  FirebaseAuth.instance.authStateChanges().listen((User? user) {
+                  if (user == null) {
+                    print('');
+                  } else {
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+                    print('User is signed in!');
+                  }
+                  });
+                 }
                ),
               //OTP-Sign In Icon
                FloatingActionButton(
