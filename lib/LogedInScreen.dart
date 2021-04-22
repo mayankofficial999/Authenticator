@@ -28,7 +28,7 @@ class _LogedInPageState extends State<LogedInPage> {
   String checkMail()
   {
     if(FirebaseAuth.instance.currentUser?.email==null)
-    return " NA";
+    return "default@example.com";
     else
     return FirebaseAuth.instance.currentUser?.email as String;
   }
@@ -54,9 +54,15 @@ class _LogedInPageState extends State<LogedInPage> {
           ClipOval(
           child:
               Image.network(checkUrl(),
-              fit: BoxFit.fill),
+              fit: BoxFit.fill,
+              loadingBuilder: (context, child, loadingProgress) {
+              if(loadingProgress == null) return child;
+              else
+              return CircularProgressIndicator(strokeWidth: 5,);
+              },
+            ),
           ),
-          margin: const EdgeInsets.only(top:200,bottom:40,left: 120,right: 120),
+          margin: const EdgeInsets.only(top:200,bottom:40,left: 150,right: 150),
           )
           ),
           //Name

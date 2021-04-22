@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:authenticator/LogedInScreen.dart';
 import 'package:authenticator/PhoneAuth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'authentication.dart';
 import 'package:flutter/services.dart';
+import 'package:otp_text_field/otp_field.dart';
+import 'package:otp_text_field/style.dart';
 
-//import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:firebase_core/firebase_core.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIOverlays(
@@ -25,9 +27,31 @@ class OTPcheck extends StatefulWidget {
 
 class _OTPcheckState extends State<OTPcheck> {
   var hint;
+  bool showInputField = false;
+  String heading= 'Verification';
+  String buttonText='Get OTP';
   int c=0;
+  String pin='';
   final myController3 = TextEditingController();
+  bool visible=false;
+  void changeProgress()
+  {
+    setState(() {
+      visible=!visible;
+    });
+  }
   // final myController4 = TextEditingController();
+  void changeInputField()
+  {
+    setState(() {
+      showInputField=!showInputField;
+      if(heading=='Verification')
+      heading='Enter OTP';
+      if(buttonText=='Get OTP')
+      buttonText='Sign In';
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +65,8 @@ class _OTPcheckState extends State<OTPcheck> {
           image: AssetImage('assets/background/y1ostvqnr4711.jpg'),
           fit: BoxFit.cover)
         ),
-        child:
+        child: 
+        Stack(children:[
         Column(
           children:
         [
@@ -49,16 +74,57 @@ class _OTPcheckState extends State<OTPcheck> {
           Center(child:
           Container(child:
           ClipOval(
-          child:
-              Image.network("https://img.freepik.com/free-vector/security-otp-one-time-password-smartphone-shield_9904-104.jpg?size=626&ext=jpg",
-              fit: BoxFit.fill),
+          child: Image.asset("assets/icons/otpscreen.jpg"),
           ),
-          margin: const EdgeInsets.only(top:150,bottom:50,left: 100,right: 100),
+          margin: const EdgeInsets.only(top:120,bottom:50,left: 150,right: 150),
           )
           ),
-          Text('Verification',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,)),
+          Text('$heading',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,)),
           Text(''),
-          Container(child:
+          showInputField? otpbox():phoneNumber(),
+          Text(''),
+          ElevatedButton(onPressed: () async{
+            Firebase.initializeApp();
+            await PhoneAuth(myController3.text,pin,context).verifyPhone();
+            FirebaseAuth.instance.authStateChanges().listen((User? user) {
+                if (user == null) {     
+                  if(heading=='Verification'&&myController3.text.length==13)
+                  {
+                  changeProgress();
+                  Timer(Duration(milliseconds: 1000),(){changeInputField();changeProgress();});}
+                  else if(heading=='Enter OTP'&&pin.length==6)
+                  {
+                    changeProgress();
+                  Timer(Duration(milliseconds: 5000),(){changeProgress();});
+                  }
+                } else {
+                  pin='';
+                  Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+                  print('User is signed in!');
+                }
+                });
+            }, child: Text('      $buttonText      ')),
+        ]
+        ),
+        Center(child:SizedBox(height:100,width: 100,child:
+          visible? 
+          CircularProgressIndicator(
+            backgroundColor: Colors.white,
+            valueColor: AlwaysStoppedAnimation(Colors.lightBlue),
+            strokeWidth: 10,
+            semanticsLabel: 'Loading ...',
+          ) 
+          :
+          Container(),
+          ),
+          ),
+        ]
+        ),
+      ),
+    );
+  }
+  Widget phoneNumber(){
+    return Container(child:
           TextFormField(
               decoration: const InputDecoration(
               icon: Icon(Icons.phone),
@@ -69,36 +135,27 @@ class _OTPcheckState extends State<OTPcheck> {
               controller: myController3,
             ),
             margin: EdgeInsets.only(left: 20,right: 20,top: 10),
+          );
+  }
+
+  Widget otpbox(){
+    return Container(child:
+          OTPTextField(
+            length: 6,
+            width: MediaQuery.of(context).size.width,
+            fieldWidth: 25,
+            style: TextStyle(
+              fontSize: 17
+            ),
+            textFieldAlignment: MainAxisAlignment.spaceAround,
+            fieldStyle: FieldStyle.underline,
+            onChanged: (pin1) {
+              print("Completed: " + pin1);
+              pin=pin1;
+            },
+            onCompleted: (pin1) {pin=pin1;}
           ),
-          Text(''),
-          // Container(child:
-          // TextFormField(
-          //     decoration: const InputDecoration(
-          //     icon: Icon(Icons.message),
-          //     border: OutlineInputBorder(),
-          //     hintText: '_ _ _ _ _ _',
-          //     labelText: 'Enter OTP',
-          //     ),
-          //     controller: myController4,
-          //   ),
-          //   margin: EdgeInsets.only(left: 20,right: 20,top: 30,bottom: 50),
-          // ),
-             Text(''),
-            ElevatedButton(onPressed: () async{
-              Firebase.initializeApp();
-              FirebaseAuth.instance.authStateChanges().listen((User? user) {
-                  if (user == null) {
-                    print('');
-                  } else {
-                    Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
-                    print('User is signed in!');
-                  }
-                  });
-                  PhoneAuth(myController3.text,'',context).verifyPhone();
-              }, child: Text('      Verify      ')),
-        ]
-        ),
-      ),
+          margin: EdgeInsets.only(bottom:30,left:20,right:20),
     );
   }
 }
@@ -112,6 +169,23 @@ class _LoginPageState extends State<LoginPage> {
   //bool _isSigningIn = false;
   final myController1 = TextEditingController();
   final myController2 = TextEditingController();
+  bool visible1=false;
+  bool visible2=false;
+  bool visible3=false;
+  bool visible4=false;
+  void changeProgress(int i)
+  {
+    setState(() {
+      if(i==1)
+      visible1=!visible1;
+      else if(i==2)
+      visible2=!visible2;
+      else if(i==3)
+      visible3=!visible3;
+      else if(i==4)
+      visible4=!visible4;
+    });
+  }
   @override
   Widget build(BuildContext context) {
   final obj =Authentication(context);
@@ -177,27 +251,60 @@ class _LoginPageState extends State<LoginPage> {
           //SignIn or SignUp Buttons
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
+            Stack(children:[
+                SizedBox(height:36,width: 80,child:
+                visible3? 
+                LinearProgressIndicator(
+                  backgroundColor: Colors.white,
+                  valueColor: AlwaysStoppedAnimation(Colors.lightBlue),
+                  minHeight: 1,
+                ) 
+                :
+                Container(),),
             ElevatedButton(onPressed: () {
+              changeProgress(3);
               Authentication(context);
+              Timer(Duration(milliseconds: 500),(){
               obj.signin(myController1.text,myController2.text);
               FirebaseAuth.instance.authStateChanges().listen((User? user) {
               if(user!=null)
               Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
               }
               );
+              changeProgress(3);
+              });
               },
               child: Text("Sign In"),
               ),
+              ]
+              ),
+
+            Stack(children:[
+                SizedBox(height:36,width: 80,child:
+                visible4? 
+                LinearProgressIndicator(
+                  backgroundColor: Colors.white,
+                  valueColor: AlwaysStoppedAnimation(Colors.lightBlue),
+                  minHeight: 1,
+                ) 
+                :
+                Container(),),
             ElevatedButton(onPressed: () {
+              changeProgress(4);
               Authentication(context);
+              Timer(Duration(milliseconds: 500),(){
               obj.signup(myController1.text,myController2.text);
               FirebaseAuth.instance.authStateChanges().listen((User? user) {
               if(user!=null)
               Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
               }
               );
+              changeProgress(4);
+              });
               },
               child: Text("Sign Up"),
+              ),
+              ]
               ),
           ]),
           // OR Text
@@ -223,6 +330,17 @@ class _LoginPageState extends State<LoginPage> {
               //  ImageIcon(AssetImage("assets/icons/apple.png"),size: 30),
               //  onPressed: (){},
               //  ),
+              Stack(children:[
+                SizedBox(height:56,width: 54,child:
+                visible1? 
+                CircularProgressIndicator(
+                  backgroundColor: Colors.redAccent,
+                  valueColor: AlwaysStoppedAnimation(Colors.green),
+                  strokeWidth: 15,
+                ) 
+                :
+                Container(), 
+               ),
               // Google Sign In Icon
                FloatingActionButton(
                  heroTag: 'btn1',
@@ -236,6 +354,8 @@ class _LoginPageState extends State<LoginPage> {
                   FirebaseAuth.instance.authStateChanges().listen((User? user) {
                   if (user == null) {
                     print('');
+                    changeProgress(1);
+                    Timer(Duration(seconds: 1),(){changeProgress(1);});
                   } else {
                     Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
                     print('User is signed in!');
@@ -243,15 +363,30 @@ class _LoginPageState extends State<LoginPage> {
                   });
                  }
                ),
+              ]
+              ),
+
+              Stack(children:[
+                SizedBox(height:56,width: 54,child:
+                visible2? 
+                CircularProgressIndicator(
+                  backgroundColor: Colors.redAccent,
+                  valueColor: AlwaysStoppedAnimation(Colors.green),
+                  strokeWidth: 15,
+                ) 
+                :
+                Container(), 
+               ),
               //OTP-Sign In Icon
                FloatingActionButton(
                  heroTag: 'btn2',
               backgroundColor: Colors.blueAccent,
               child:
                Icon(Icons.phone,size: 30,),
-               onPressed: (){Navigator.push(context,MaterialPageRoute(builder: (context) => OTPcheck()),);},
+               onPressed: (){changeProgress(2);Timer(Duration(milliseconds: 500),(){Navigator.push(context,MaterialPageRoute(builder: (context) => OTPcheck()),);changeProgress(2);});},
                ),
-              
+              ]
+              ),
           ]),
         ]
         )

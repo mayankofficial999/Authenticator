@@ -22,7 +22,7 @@ class PhoneAuth
   final String phoneNo;
   final String? otp;
   PhoneAuth(this.phoneNo,this.otp,this.context);
-  Future<String?> verifyPhone() async
+  Future<void> verifyPhone() async
   {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
     if (user == null) {
@@ -35,7 +35,6 @@ class PhoneAuth
     phoneNumber: phoneNo,
     verificationCompleted: (PhoneAuthCredential credential) async {
      await auth.signInWithCredential(credential);
-     return null;
     },
     verificationFailed: (FirebaseAuthException e) {
       _showMyDialog(e.code);
