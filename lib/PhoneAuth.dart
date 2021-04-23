@@ -22,28 +22,22 @@ class PhoneAuth
   final String phoneNo;
   final String? otp;
   PhoneAuth(this.phoneNo,this.otp,this.context);
-  Future<void> verifyPhone() async
+  Future<void> verifyPhone(int x) async
   {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-    if (user == null) {
-      print('User is currently signed out!');
-    } else {
-      print('User is signed in!');
-    }
-    });
     await FirebaseAuth.instance.verifyPhoneNumber(
     phoneNumber: phoneNo,
     verificationCompleted: (PhoneAuthCredential credential) async {
      await auth.signInWithCredential(credential);
     },
     verificationFailed: (FirebaseAuthException e) {
-      _showMyDialog(e.code);
+      _showMyDialog('Auto Verification failed !\n Enter OTP Manually');
     if (e.code == 'invalid-phone-number') {
       print('The provided phone number is not valid.');
     }
   },
     codeSent: (String verificationId, int? resendToken) async {
     // Update the UI - wait for the user to enter the SMS code
+    if(x==1){
     String smsCode = '$otp';
 
     // Create a PhoneAuthCredential with the code
@@ -51,7 +45,8 @@ class PhoneAuth
 
     // Sign the user in (or link) with the credential
     await auth.signInWithCredential(credential);
-  },
+    }
+    },
     codeAutoRetrievalTimeout: (String verificationId) {},
     );
   }

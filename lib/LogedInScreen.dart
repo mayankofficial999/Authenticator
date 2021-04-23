@@ -9,14 +9,6 @@ class LogedInPage extends StatefulWidget{
 
 class _LogedInPageState extends State<LogedInPage> {
 
-  String checkUrl()
-  {
-    if(FirebaseAuth.instance.currentUser?.photoURL==null)
-    return "https://aspire.rit.edu/sites/default/files/styles/image_large_thumbnail/public/default_images/profile-picture-default.png?itok=g_gy_X5Q";
-    else
-    return FirebaseAuth.instance.currentUser?.photoURL as String;
-  }
-
   String checkName()
   {
     if(FirebaseAuth.instance.currentUser?.displayName==null)
@@ -33,7 +25,7 @@ class _LogedInPageState extends State<LogedInPage> {
     return FirebaseAuth.instance.currentUser?.email as String;
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     final obj=Authentication(context);
     return Scaffold(
@@ -52,15 +44,15 @@ class _LogedInPageState extends State<LogedInPage> {
           Center(child:
           Container(child:
           ClipOval(
-          child:
-              Image.network(checkUrl(),
-              fit: BoxFit.fill,
-              loadingBuilder: (context, child, loadingProgress) {
-              if(loadingProgress == null) return child;
-              else
+          child: FirebaseAuth.instance.currentUser?.photoURL==null ? Image.asset('assets/icons/default.png') : 
+          Image.network(FirebaseAuth.instance.currentUser?.photoURL as String,fit:BoxFit.fill,
+          loadingBuilder: (context, child, loadingProgress) {
+            if(loadingProgress==null)
+              return child;
+            else
               return CircularProgressIndicator(strokeWidth: 5,);
-              },
-            ),
+          },
+          ),
           ),
           margin: const EdgeInsets.only(top:200,bottom:40,left: 150,right: 150),
           )

@@ -85,24 +85,60 @@ class _OTPcheckState extends State<OTPcheck> {
           Text(''),
           ElevatedButton(onPressed: () async{
             Firebase.initializeApp();
-            await PhoneAuth(myController3.text,pin,context).verifyPhone();
+            changeProgress();
             FirebaseAuth.instance.authStateChanges().listen((User? user) {
-                if (user == null) {     
-                  if(heading=='Verification'&&myController3.text.length==13)
-                  {
-                  changeProgress();
-                  Timer(Duration(milliseconds: 1000),(){changeInputField();changeProgress();});}
-                  else if(heading=='Enter OTP'&&pin.length==6)
-                  {
-                    changeProgress();
-                  Timer(Duration(milliseconds: 5000),(){changeProgress();});
-                  }
-                } else {
-                  pin='';
-                  Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
-                  print('User is signed in!');
-                }
-                });
+              if (user == null) 
+              { 
+                print('User is logged out !');
+              }
+              else
+              {
+                print('User is logged in !');
+                changeProgress();
+                Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+              }
+              });
+            if(showInputField==false)
+            {
+              await PhoneAuth(myController3.text,pin,context).verifyPhone(0);
+            Timer(Duration(seconds: 5),()async{
+              changeInputField();
+              changeProgress();});
+            }
+            else
+            await PhoneAuth(myController3.text,pin,context).verifyPhone(1);
+            // if(code==1)
+            // {
+            //   changeProgress();
+            //   Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+            // }
+            // else if(code==2)
+            // {
+            //   changeInputField();
+            //   changeProgress();
+            // }
+            // else if(code==3)
+            // {
+            //   changeProgress();
+            //   Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+            // }
+            // FirebaseAuth.instance.authStateChanges().listen((User? user) {
+            //     if (user == null) {     
+            //       if(heading=='Verification'&&myController3.text.length==13)
+            //       {
+            //       changeProgress();
+            //       Timer(Duration(milliseconds: 1000),(){changeInputField();changeProgress();});}
+            //       else if(heading=='Enter OTP'&&pin.length==6)
+            //       {
+            //         changeProgress();
+            //       Timer(Duration(milliseconds: 5000),(){changeProgress();});
+            //       }
+            //     } else {
+            //       pin='';
+            //       Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+            //       print('User is signed in!');
+            //     }
+            //     });
             }, child: Text('      $buttonText      ')),
         ]
         ),
@@ -153,7 +189,10 @@ class _OTPcheckState extends State<OTPcheck> {
               print("Completed: " + pin1);
               pin=pin1;
             },
-            onCompleted: (pin1) {pin=pin1;}
+            onCompleted: (pin1) async{pin=pin1;
+            changeProgress();
+            Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
+            }
           ),
           margin: EdgeInsets.only(bottom:30,left:20,right:20),
     );
@@ -350,13 +389,11 @@ class _LoginPageState extends State<LoginPage> {
                onPressed:() async {
                   Authentication(context);
                   obj.signInWithGoogle();
-                  Future.delayed(const Duration(milliseconds: 2000));
                   FirebaseAuth.instance.authStateChanges().listen((User? user) {
                   if (user == null) {
-                    print('');
                     changeProgress(1);
-                    Timer(Duration(seconds: 1),(){changeProgress(1);});
                   } else {
+                    changeProgress(1);
                     Navigator.push(context,MaterialPageRoute(builder: (context) => LogedInPage()),);
                     print('User is signed in!');
                   }
